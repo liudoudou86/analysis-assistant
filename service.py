@@ -12,10 +12,8 @@ import urllib.parse
 app = FastAPI()
 
 # 解耦所有鉴权
-cozeAuthorization = (
-    "pat_xAAmlxWAYZi85woQoIbM6yetJYVzWh5jWAxgK0UdRRirF23SSxI5Wo1Xx2Wtxwvb"
-)
-botId = "7419121331410616370"
+cozeAuthorization = "个人令牌"
+botId = "机器人ID"
 
 
 # 扣子Bot请求接口
@@ -89,8 +87,8 @@ def send_msg(
             "---\n\n"
             "#### Commit分析结果 ⬇\n\n"
             f"{message}\n\n"
-            "@13820303577",
-            atMobiles=["+86-13820303577"],
+            "@手机号",
+            atMobiles=["+86-手机号"],
             isAtAll=False,
         )
     except Exception as e:
@@ -125,4 +123,4 @@ async def process_commit(
 
 
 if __name__ == "__main__":
-    uvicorn.run("service:app", host="10.6.0.116", port=15001, reload=True)
+    uvicorn.run("service:app", host="127.0.0.1", port=8888, reload=True)
