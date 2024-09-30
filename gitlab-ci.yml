@@ -1,0 +1,22 @@
+stages:
+  - git-log-analysis
+
+git-log-analysis:
+  stage: git-log-analysis
+  when: manual
+  variables:
+    ANALYSIS_HOST: 127.0.0.1
+    ANALYSIS_PORT: 8888
+    DINGDING_SECRET: 
+    DINGDING_TOKEN: 
+  script:
+    - echo "Git-Log-Analysis triggered by ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}"
+    - gitLog=$(git diff HEAD~1 HEAD)
+    - json_data=$(echo "${gitLog}" | jq -sRr @json)
+    - echo "${json_data}"
+    - >
+      curl -v "http://${ANALYSIS_HOST}:${ANALYSIS_PORT}/analysis/" \
+            -H "Content-Type: application/json" \
+            -d '{"dingdingSecret":"${DINGDING_SECRET}","dingdingToken":"${DINGDING_TOKEN}","projectName":"${CI_PROJECT_NAME}","commitName":"${CI_COMMIT_REF_NAME}","commitSha":"${CI_COMMIT_SHA}","gitLog":"${json_data}"}'
+  only:
+    - develop

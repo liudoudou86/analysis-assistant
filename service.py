@@ -8,12 +8,15 @@ import hmac
 import hashlib
 import base64
 import urllib.parse
+from pydantic import BaseModel
 
 app = FastAPI()
 
 # 解耦所有鉴权
-cozeAuthorization = "个人令牌"
-botId = "机器人ID"
+cozeAuthorization = (
+    "pat_123"
+)
+botId = "123"
 
 
 # 扣子Bot请求接口
@@ -87,25 +90,35 @@ def send_msg(
             "---\n\n"
             "#### Commit分析结果 ⬇\n\n"
             f"{message}\n\n"
-            "@手机号",
-            atMobiles=["+86-手机号"],
+            "@13820303577",
+            atMobiles=["+86-13820303577"],
             isAtAll=False,
         )
     except Exception as e:
         print(f"钉钉错误信息: {e}")
 
 
+# 请求体
+class CommitInfo(BaseModel):
+    dingdingSecret: str
+    dingdingToken: str
+    projectName: str
+    commitName: str
+    commitSha: str
+    gitLog: str
+
+
 # 接口服务
-@app.post("/analysis/")
-async def process_commit(
-    dingdingSecret: str,
-    dingdingToken: str,
-    projectName: str,
-    commitName: str,
-    commitSha: str,
-    gitLog: str,
-):
+@app.post("/analysis/", response_model=dict, responses={500: {"model": dict}})
+async def process_commit(commitInfo: CommitInfo):
     try:
+        dingdingSecret = commitInfo.dingdingSecret
+        dingdingToken = commitInfo.dingdingToken
+        projectName = commitInfo.projectName
+        commitName = commitInfo.commitName
+        commitSha = commitInfo.commitSha
+        gitLog = commitInfo.gitLog
+
         message = getResult(gitLog)
         send_msg(
             dingdingSecret,
@@ -117,7 +130,7 @@ async def process_commit(
             message,
         )
         return {"code": 0, "result": "success"}
-    except Exception as e:
+    except ValueError as e:
         print(f"接口错误信息: {e}")
         return {"code": 500, "result": "fail"}
 
