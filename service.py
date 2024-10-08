@@ -77,7 +77,14 @@ def createSign(dingdingSecret):
 
 # 推送钉钉提醒
 def send_msg(
-    dingdingSecret, dingdingToken, projectName, commitName, commitSha, title, message
+    dingdingSecret,
+    dingdingToken,
+    projectName,
+    projectUrl,
+    commitName,
+    commitSha,
+    title,
+    message,
 ):
     timestamp, sign = createSign(dingdingSecret)
     commitShaUpdate = commitSha[:9]
@@ -89,8 +96,8 @@ def send_msg(
             Title=title,
             Content=f"### {title}:\n\n"
             f"##### [项目名称]: {projectName}\n\n"
-            f"##### [触发分支]: [{commitName}](http://idp-gitlab.tasly.com/qa/automation/apis/{projectName}/tree/{commitName})\n\n"
-            f"##### [触发提交]: [{commitShaUpdate}](http://idp-gitlab.tasly.com/qa/automation/apis/{projectName}/commit/{commitSha})\n\n"
+            f"##### [触发分支]: [{commitName}]({projectUrl}/tree/{commitName})\n\n"
+            f"##### [触发提交]: [{commitShaUpdate}]({projectUrl}/commit/{commitSha})\n\n"
             "---\n\n"
             "#### Commit分析结果 ⬇\n\n"
             f"{message}\n\n"
@@ -108,6 +115,7 @@ class CommitInfo(BaseModel):
     dingdingSecret: str
     dingdingToken: str
     projectName: str
+    projectUrl: str
     commitName: str
     commitSha: str
     gitLog: str
@@ -120,6 +128,7 @@ async def process_commit(commitInfo: CommitInfo):
         dingdingSecret = commitInfo.dingdingSecret
         dingdingToken = commitInfo.dingdingToken
         projectName = commitInfo.projectName
+        projectUrl = commitInfo.projectUrl
         commitName = commitInfo.commitName
         commitSha = commitInfo.commitSha
         gitLog = commitInfo.gitLog
@@ -129,6 +138,7 @@ async def process_commit(commitInfo: CommitInfo):
             dingdingSecret,
             dingdingToken,
             projectName,
+            projectUrl,
             commitName,
             commitSha,
             "Git-Commit Analysis",

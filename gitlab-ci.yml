@@ -1,7 +1,7 @@
 stages:
   - git-log-analysis
 
-git-log-analysis-test:
+git-log-analysis:
   stage: git-log-analysis
   when: on_success
   variables:
@@ -10,13 +10,13 @@ git-log-analysis-test:
     DINGDING_SECRET: 
     DINGDING_TOKEN: 
   script:
-    - echo "Git-Log-Analysis triggered by ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}"
-    - gitLog=$(git diff HEAD~1 HEAD | jq -sRr @json)
+    - echo "Git-Log-Analysis triggered by ${CI_PROJECT_NAME}-${CI_PROJECT_URL}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}"
+    - gitLog=$(git diff HEAD~1 HEAD | jq -sRr @json | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/$/\\n/')
     - echo "${gitLog}"
     - >
       curl -v -X POST "http://${ANALYSIS_HOST}:${ANALYSIS_PORT}/analysis/" \
             -H "Content-Type: application/json" \
-            -d "{\"dingdingSecret\": \"$DINGDING_SECRET\", \"dingdingToken\": \"$DINGDING_TOKEN\", \"projectName\": \"$CI_PROJECT_NAME\", \"commitName\": \"$CI_COMMIT_REF_NAME\", \"commitSha\": \"$CI_COMMIT_SHA\", \"gitLog\": \"gitLog\"}"
+            -d "{\"dingdingSecret\": \"$DINGDING_SECRET\", \"dingdingToken\": \"$DINGDING_TOKEN\", \"projectName\": \"$CI_PROJECT_NAME\", \"projectUrl\": \"$CI_PROJECT_URL\", \"commitName\": \"$CI_COMMIT_REF_NAME\", \"commitSha\": \"$CI_COMMIT_SHA\", \"gitLog\": \"$gitLog\"}"
   only:
     - tags
     - master
