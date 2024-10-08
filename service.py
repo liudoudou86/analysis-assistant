@@ -10,13 +10,15 @@ import base64
 import urllib.parse
 from pydantic import BaseModel
 
-app = FastAPI()
+app = FastAPI(
+    title="Git提交分析应用", version="0.0.1", description="Git提交分析应用接口"
+)
 
 # 解耦所有鉴权
 cozeAuthorization = (
-    "pat_123"
+    ""
 )
-botId = "123"
+botId = ""
 
 
 # 扣子Bot请求接口
@@ -78,22 +80,25 @@ def send_msg(
     dingdingSecret, dingdingToken, projectName, commitName, commitSha, title, message
 ):
     timestamp, sign = createSign(dingdingSecret)
+    commitShaUpdate = commitSha[:9]
     url = f"https://oapi.dingtalk.com/robot/send?access_token={dingdingToken}&timestamp={timestamp}&sign={sign}"
+    print(f"请求地址: {url}")
     dd = DingDing(webhook=url)
     try:
-        dd.Send_MardDown_Msg(
+        ddInfo = dd.Send_MardDown_Msg(
             Title=title,
             Content=f"### {title}:\n\n"
             f"##### [项目名称]: {projectName}\n\n"
-            f"##### [分支名称]: {commitName}\n\n"
-            f"##### [分支版本]: {commitSha}\n\n"
+            f"##### [触发分支]: [{commitName}](http://idp-gitlab.tasly.com/qa/automation/apis/{projectName}/tree/{commitName})\n\n"
+            f"##### [触发提交]: [{commitShaUpdate}](http://idp-gitlab.tasly.com/qa/automation/apis/{projectName}/commit/{commitSha})\n\n"
             "---\n\n"
             "#### Commit分析结果 ⬇\n\n"
             f"{message}\n\n"
-            "@13820303577",
-            atMobiles=["+86-13820303577"],
+            "@13820303577 @18622653082",
+            atMobiles=["+86-13820303577", "+86-18622653082"],
             isAtAll=False,
         )
+        print(f"钉钉发送成功: {ddInfo}")
     except Exception as e:
         print(f"钉钉错误信息: {e}")
 
@@ -136,4 +141,4 @@ async def process_commit(commitInfo: CommitInfo):
 
 
 if __name__ == "__main__":
-    uvicorn.run("service:app", host="127.0.0.1", port=8888, reload=True)
+    uvicorn.run("service:app", host="10.6.0.116", port=15001, reload=True)
