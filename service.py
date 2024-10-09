@@ -83,6 +83,8 @@ def send_msg(
     projectUrl,
     commitName,
     commitSha,
+    commitMessage,
+    commitUser,
     title,
     message,
 ):
@@ -95,9 +97,11 @@ def send_msg(
         ddInfo = dd.Send_MardDown_Msg(
             Title=title,
             Content=f"### {title}:\n\n"
-            f"##### [项目名称]: {projectName}\n\n"
-            f"##### [触发分支]: [{commitName}]({projectUrl}/tree/{commitName})\n\n"
-            f"##### [触发提交]: [{commitShaUpdate}]({projectUrl}/commit/{commitSha})\n\n"
+            f">#### [项目名称]: {projectName}\n\n"
+            f">#### [触发分支]: [{commitName}]({projectUrl}/tree/{commitName})\n\n"
+            f">#### [触发提交]: [{commitShaUpdate}]({projectUrl}/commit/{commitSha})\n\n"
+            f"> -[提交信息]: {commitMessage}\n\n"
+            f"> -[提交人员]: {commitUser}\n\n"
             "---\n\n"
             "#### Commit分析结果 ⬇\n\n"
             f"{message}\n\n"
@@ -118,6 +122,8 @@ class CommitInfo(BaseModel):
     projectUrl: str
     commitName: str
     commitSha: str
+    commitMessage: str
+    commitUser: str
     gitLog: str
 
 
@@ -131,6 +137,8 @@ async def process_commit(commitInfo: CommitInfo):
         projectUrl = commitInfo.projectUrl
         commitName = commitInfo.commitName
         commitSha = commitInfo.commitSha
+        commitMessage = commitInfo.commitMessage
+        commitUser = commitInfo.commitUser
         gitLog = commitInfo.gitLog
 
         message = getResult(gitLog)
@@ -141,6 +149,8 @@ async def process_commit(commitInfo: CommitInfo):
             projectUrl,
             commitName,
             commitSha,
+            commitMessage,
+            commitUser,
             "Git-Commit Analysis",
             message,
         )

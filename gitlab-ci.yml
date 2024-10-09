@@ -10,21 +10,29 @@ git-log-analysis:
     DINGDING_SECRET: 
     DINGDING_TOKEN: 
   script:
-    - echo "Git-Log-Analysis triggered by ${CI_PROJECT_NAME}-${CI_PROJECT_URL}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}"
+    - echo "Git-Log-Analysis triggered by ${CI_PROJECT_NAME}-${CI_PROJECT_URL}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}-${CI_COMMIT_MESSAGE}-${GITLAB_USER_LOGIN}"
+    - commitMessage=$(echo $CI_COMMIT_MESSAGE | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/$/\\n/')
     - gitLog=$(git diff HEAD~1 HEAD | jq -sRr @json | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/$/\\n/')
     - echo "${gitLog}"
     - >
       curl -v -X POST "http://${ANALYSIS_HOST}:${ANALYSIS_PORT}/analysis/" \
             -H "Content-Type: application/json" \
-            -d "{\"dingdingSecret\": \"$DINGDING_SECRET\", \"dingdingToken\": \"$DINGDING_TOKEN\", \"projectName\": \"$CI_PROJECT_NAME\", \"projectUrl\": \"$CI_PROJECT_URL\", \"commitName\": \"$CI_COMMIT_REF_NAME\", \"commitSha\": \"$CI_COMMIT_SHA\", \"gitLog\": \"$gitLog\"}"
+            -d "{
+            \"dingdingSecret\": \"$DINGDING_SECRET\", 
+            \"dingdingToken\": \"$DINGDING_TOKEN\", 
+            \"projectName\": \"$CI_PROJECT_NAME\", 
+            \"projectUrl\": \"$CI_PROJECT_URL\", 
+            \"commitName\": \"$CI_COMMIT_REF_NAME\", 
+            \"commitSha\": \"$CI_COMMIT_SHA\", 
+            \"commitMessage\": \"$commitMessage\", 
+            \"commitUser\": \"$GITLAB_USER_LOGIN\", 
+            \"gitLog\": \"$gitLog\"
+            }"
   only:
     - tags
-    - master
     - stage
     - uat
-    - release
     - /.*-cube-snapshot$/
-    - /^release-.*$/
     - /^hotfix-.*$/
     - /^hotfix.*$/
     - /^feature.*$/
