@@ -97,11 +97,11 @@ def send_msg(
         ddInfo = dd.Send_MardDown_Msg(
             Title=title,
             Content=f"### {title}:\n\n"
-            f">#### [项目名称]: {projectName}\n\n"
-            f">#### [触发分支]: [{commitName}]({projectUrl}/tree/{commitName})\n\n"
-            f">#### [触发提交]: [{commitShaUpdate}]({projectUrl}/commit/{commitSha})\n\n"
-            f"> -[提交信息]: {commitMessage}\n\n"
-            f"> -[提交人员]: {commitUser}\n\n"
+            f"#### [项目名称]: {projectName}\n\n"
+            f"#### [触发分支]: [{commitName}]({projectUrl}/tree/{commitName})\n\n"
+            f"#### [触发提交]: [{commitShaUpdate}]({projectUrl}/commit/{commitSha})\n\n"
+            f" - [提交信息]: {commitMessage}\n\n"
+            f" - [提交人员]: {commitUser}\n\n"
             "---\n\n"
             "#### Commit分析结果 ⬇\n\n"
             f"{message}\n\n"
