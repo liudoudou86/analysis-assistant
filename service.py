@@ -38,8 +38,9 @@ def createConversation(message):
         ],
     }
     response = requests.post(url=url, headers=headers, json=json, stream=True)
-    print(response.text)
-    return response
+    outputValue = response.json().get("output", "")
+    print(outputValue)
+    return outputValue
 
 
 # 提取返回内容
@@ -77,16 +78,16 @@ def createSign(dingdingSecret):
 
 # 推送钉钉提醒
 def send_msg(
-    dingdingSecret,
-    dingdingToken,
-    projectName,
-    projectUrl,
-    commitName,
-    commitSha,
-    commitMessage,
-    commitUser,
-    title,
-    message,
+        dingdingSecret,
+        dingdingToken,
+        projectName,
+        projectUrl,
+        commitName,
+        commitSha,
+        commitMessage,
+        commitUser,
+        title,
+        message,
 ):
     timestamp, sign = createSign(dingdingSecret)
     commitShaSplit = commitSha[:9]
@@ -97,15 +98,15 @@ def send_msg(
         ddInfo = dd.Send_MardDown_Msg(
             Title=title,
             Content=f"### {title}:\n\n"
-            f"#### [项目名称]: {projectName}\n\n"
-            f"#### [触发分支]: [{commitName}]({projectUrl}/tree/{commitName})\n\n"
-            f"#### [触发提交]: [{commitShaSplit}]({projectUrl}/commit/{commitSha})\n\n"
-            f"#### [提交信息]: {commitMessage}\n\n"
-            f"#### [提交人员]: {commitUser}\n\n"
-            "---\n\n"
-            "#### Commit分析结果 ⬇\n\n"
-            f"{message}\n\n"
-            "@13820303577 @18622653082",
+                    f"#### [项目名称]: {projectName}\n\n"
+                    f"#### [触发分支]: [{commitName}]({projectUrl}/tree/{commitName})\n\n"
+                    f"#### [触发提交]: [{commitShaSplit}]({projectUrl}/commit/{commitSha})\n\n"
+                    f"#### [提交信息]: {commitMessage}\n\n"
+                    f"#### [提交人员]: {commitUser}\n\n"
+                    "---\n\n"
+                    "#### Commit分析结果 ⬇\n\n"
+                    f"{message}\n\n"
+                    "@13820303577 @18622653082",
             atMobiles=["+86-13820303577", "+86-18622653082"],
             isAtAll=False,
         )
@@ -161,4 +162,4 @@ async def process_commit(commitInfo: CommitInfo):
 
 
 if __name__ == "__main__":
-    uvicorn.run("service:app", host="10.6.0.116", port=15001, reload=True)
+    uvicorn.run("service:app", host="127.0.0.1", port=15001, reload=True)
