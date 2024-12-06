@@ -38,9 +38,8 @@ def createConversation(message):
         ],
     }
     response = requests.post(url=url, headers=headers, json=json, stream=True)
-    outputValue = response.json().get("output", "")
-    print(outputValue)
-    return outputValue
+    print(response.text)
+    return response
 
 
 # 提取返回内容
@@ -162,4 +161,4 @@ async def process_commit(commitInfo: CommitInfo):
 
 
 if __name__ == "__main__":
-    uvicorn.run("service:app", host="127.0.0.1", port=15001, reload=True)
+    uvicorn.run("service:app", host="127.0.0.1", port=5001, reload=True)
