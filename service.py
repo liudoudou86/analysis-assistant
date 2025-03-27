@@ -1,24 +1,25 @@
-from fastapi import FastAPI
-import uvicorn
-import requests
-import re
-from DingDingBot.DDBOT import DingDing
-import time
-import hmac
-import hashlib
 import base64
+import hashlib
+import hmac
+import re
+import time
 import urllib.parse
+
+import requests
+import uvicorn
+from DingDingBot.DDBOT import DingDing
+from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI(
-    title="Git提交分析应用", version="0.0.1", description="Git提交分析应用接口"
+    title="Git提交分析应用", version="1.0.0", description="Git提交分析应用接口"
 )
 
 # 解耦所有鉴权
 cozeAuthorization = (
-    ""
+    "pat_xAAmlxWAYZi85woQoIbM6yetJYVzWh5jWAxgK0UdRRirF23SSxI5Wo1Xx2Wtxwvb"
 )
-botId = ""
+botId = "7419121331410616370"
 
 
 # 扣子Bot请求接口
@@ -77,16 +78,16 @@ def createSign(dingdingSecret):
 
 # 推送钉钉提醒
 def send_msg(
-        dingdingSecret,
-        dingdingToken,
-        projectName,
-        projectUrl,
-        commitName,
-        commitSha,
-        commitMessage,
-        commitUser,
-        title,
-        message,
+    dingdingSecret,
+    dingdingToken,
+    projectName,
+    projectUrl,
+    commitName,
+    commitSha,
+    commitMessage,
+    commitUser,
+    title,
+    message,
 ):
     timestamp, sign = createSign(dingdingSecret)
     commitShaSplit = commitSha[:9]
@@ -96,16 +97,19 @@ def send_msg(
     try:
         ddInfo = dd.Send_MardDown_Msg(
             Title=title,
-            Content=f"### {title}:\n\n"
-                    f"#### [项目名称]: {projectName}\n\n"
-                    f"#### [触发分支]: [{commitName}]({projectUrl}/tree/{commitName})\n\n"
-                    f"#### [触发提交]: [{commitShaSplit}]({projectUrl}/commit/{commitSha})\n\n"
-                    f"#### [提交信息]: {commitMessage}\n\n"
-                    f"#### [提交人员]: {commitUser}\n\n"
-                    "---\n\n"
-                    "#### Commit分析结果 ⬇\n\n"
-                    f"{message}\n\n"
-                    "@13820303577 @18622653082",
+            Content=f"## {title}:\n"
+            f"|[**项目名称**]: {projectName}\n\n"
+            f"|[**触发分支**]: [{commitName}]({projectUrl}/tree/{commitName})\n\n"
+            f"|[**触发提交**]: [{commitShaSplit}]({projectUrl}/commit/{commitSha})\n\n"
+            f"|[**提交信息**]: {commitMessage}\n\n"
+            f"|[**提交人员**]: {commitUser}\n\n"
+            "\n"
+            "***\n"
+            "\n"
+            "#### COMMIT分析结果 ⬇\n"
+            "\n"
+            f"{message}\n\n"
+            "@13820303577 @18622653082",
             atMobiles=["+86-13820303577", "+86-18622653082"],
             isAtAll=False,
         )
@@ -161,4 +165,4 @@ async def process_commit(commitInfo: CommitInfo):
 
 
 if __name__ == "__main__":
-    uvicorn.run("service:app", host="127.0.0.1", port=5001, reload=True)
+    uvicorn.run("service:app", host="", port=, reload=True)
