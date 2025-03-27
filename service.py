@@ -17,7 +17,7 @@ app = FastAPI(
 
 # 解耦所有鉴权
 cozeAuthorization = (
-    "pat_xAAmlxWAYZi85woQoIbM6yetJYVzWh5jWAxgK0UdRRirF23SSxI5Wo1Xx2Wtxwvb"
+    ""
 )
 botId = "7419121331410616370"
 
