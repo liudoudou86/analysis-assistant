@@ -165,4 +165,4 @@ async def process_commit(commitInfo: CommitInfo):
 
 
 if __name__ == "__main__":
-    uvicorn.run("service:app", host="", port=, reload=True)
+    uvicorn.run("codeAnalysis:app", host="", port=15001, reload=True)
